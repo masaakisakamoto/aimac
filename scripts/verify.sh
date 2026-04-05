@@ -12,11 +12,18 @@ for arg in "$@"; do
   esac
 done
 
+PROFILE_FILE="profiles/${PROFILE}.yaml"
+
 echo "AIMac Verify"
 echo "============"
 echo
 echo "Profile: $PROFILE"
 echo
+
+if [[ ! -f "$PROFILE_FILE" ]]; then
+  echo "Profile file not found: $PROFILE_FILE"
+  exit 1
+fi
 
 pass_count=0
 warn_count=0
@@ -42,81 +49,90 @@ print_section() {
   echo "[$1]"
 }
 
+profile_has_verify_command() {
+  local cmd="$1"
+  grep -A30 '^verify_commands:' "$PROFILE_FILE" | grep -q "^- $cmd\|^  - $cmd"
+}
+
 # --------------------------------------------------
-# Core usability checks
+# Core Usability
 # --------------------------------------------------
 print_section "Core Usability"
 
-if command -v git >/dev/null 2>&1; then
-  pass "Git is available"
-else
-  fail "Git is missing"
-fi
-
-if command -v python3 >/dev/null 2>&1; then
-  if python3 -c "print('ok')" >/dev/null 2>&1; then
-    pass "Python 3 is runnable"
+if profile_has_verify_command "git"; then
+  if command -v git >/dev/null 2>&1; then
+    pass "Git is available"
   else
-    fail "Python 3 exists but is not runnable"
+    fail "Git is missing"
   fi
-else
-  fail "Python 3 is missing"
 fi
 
-if command -v node >/dev/null 2>&1; then
-  if node -e "console.log('ok')" >/dev/null 2>&1; then
-    pass "Node.js is runnable"
+if profile_has_verify_command "python3"; then
+  if command -v python3 >/dev/null 2>&1; then
+    if python3 -c "print('ok')" >/dev/null 2>&1; then
+      pass "Python 3 is runnable"
+    else
+      fail "Python 3 exists but is not runnable"
+    fi
   else
-    fail "Node.js exists but is not runnable"
+    fail "Python 3 is missing"
   fi
-else
-  fail "Node.js is missing"
 fi
 
-if command -v brew >/dev/null 2>&1; then
-  pass "Homebrew is available"
-else
-  fail "Homebrew is missing"
+if profile_has_verify_command "node"; then
+  if command -v node >/dev/null 2>&1; then
+    if node -e "console.log('ok')" >/dev/null 2>&1; then
+      pass "Node.js is runnable"
+    else
+      fail "Node.js exists but is not runnable"
+    fi
+  else
+    fail "Node.js is missing"
+  fi
+fi
+
+if profile_has_verify_command "brew"; then
+  if command -v brew >/dev/null 2>&1; then
+    pass "Homebrew is available"
+  else
+    fail "Homebrew is missing"
+  fi
+fi
+
+if profile_has_verify_command "mise"; then
+  if command -v mise >/dev/null 2>&1; then
+    pass "mise is available"
+  else
+    fail "mise is missing"
+  fi
+fi
+
+if profile_has_verify_command "uv"; then
+  if command -v uv >/dev/null 2>&1; then
+    pass "uv is available"
+  else
+    fail "uv is missing"
+  fi
+fi
+
+if profile_has_verify_command "code"; then
+  if command -v code >/dev/null 2>&1; then
+    pass "VS Code CLI is available"
+  else
+    warn "VS Code CLI is not available"
+  fi
 fi
 
 # --------------------------------------------------
-# Runtime manager checks
+# Optional checks
 # --------------------------------------------------
-print_section "Runtime Management"
-
-if command -v mise >/dev/null 2>&1; then
-  pass "mise is available"
-else
-  warn "mise is missing"
-fi
-
-if command -v uv >/dev/null 2>&1; then
-  pass "uv is available"
-else
-  warn "uv is missing"
-fi
-
-# --------------------------------------------------
-# Editor / tooling checks
-# --------------------------------------------------
-print_section "Developer Tooling"
-
-if command -v code >/dev/null 2>&1; then
-  pass "VS Code CLI is available"
-else
-  warn "VS Code CLI is not available"
-fi
+print_section "Optional Checks"
 
 if command -v docker >/dev/null 2>&1; then
   pass "Docker CLI is available"
 else
   warn "Docker CLI is missing"
 fi
-
-# --------------------------------------------------
-# Optional local AI checks
-# --------------------------------------------------
-print_section "Local AI"
 
 if command -v ollama >/dev/null 2>&1; then
   if ollama list >/dev/null 2>&1; then
@@ -129,7 +145,7 @@ else
 fi
 
 # --------------------------------------------------
-# Git identity checks
+# Developer Identity
 # --------------------------------------------------
 print_section "Developer Identity"
 
@@ -147,41 +163,6 @@ if [[ -n "$GIT_EMAIL" ]]; then
 else
   warn "git user.email is not set"
 fi
-
-# --------------------------------------------------
-# Profile-specific checks
-# --------------------------------------------------
-print_section "Profile Checks"
-
-case "$PROFILE" in
-  beginner)
-    if command -v python3 >/dev/null 2>&1 && command -v node >/dev/null 2>&1; then
-      pass "Beginner profile essentials are present"
-    else
-      fail "Beginner profile essentials are incomplete"
-    fi
-    ;;
-  builder)
-    if command -v gh >/dev/null 2>&1; then
-      pass "GitHub CLI is available"
-    else
-      warn "GitHub CLI is missing for builder profile"
-    fi
-    ;;
-  local-ai)
-    if command -v ollama >/dev/null 2>&1; then
-      pass "Ollama is installed for local-ai profile"
-    else
-      fail "Ollama is required for local-ai profile"
-    fi
-    ;;
-  minimal)
-    pass "Minimal profile selected"
-    ;;
-  *)
-    warn "Unknown profile: $PROFILE"
-    ;;
-esac
 
 # --------------------------------------------------
 # Summary
