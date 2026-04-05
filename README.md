@@ -94,18 +94,7 @@ cd aimac
 ./cli/aimac plan --profile=beginner --safe
 ./cli/aimac apply --profile=beginner --safe
 ./cli/aimac verify --profile=beginner
-```
-
----
-
-## Commands
-
-```bash
-./cli/aimac doctor
-./cli/aimac plan --profile=beginner --safe
-./cli/aimac apply --profile=beginner --safe
-./cli/aimac verify --profile=beginner
-./cli/aimac report
+./cli/aimac first-success --profile=beginner
 ```
 
 Builder example:
@@ -114,18 +103,31 @@ Builder example:
 ./cli/aimac plan --profile=builder --safe
 ./cli/aimac apply --profile=builder --safe
 ./cli/aimac verify --profile=builder
+./cli/aimac first-success --profile=builder
+```
+
+---
+
+## Commands
+```bash
+./cli/aimac doctor
+./cli/aimac plan --profile=beginner --safe
+./cli/aimac apply --profile=beginner --safe
+./cli/aimac verify --profile=beginner
+./cli/aimac report
+./cli/aimac first-success --profile=beginner
 ```
 
 ---
 
 ## Current Capabilities
-
 - environment diagnosis
 - conflict detection for runtime managers
 - profile-driven planning
 - profile-driven apply
 - profile-driven verify
 - markdown artifact reporting
+- first-success onboarding flow
 
 ---
 
@@ -139,3 +141,4 @@ Current focus:
 - stronger artifact outputs
 - safer apply/force boundaries
 - richer readiness checks
+- more profiles
