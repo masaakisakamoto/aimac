@@ -8,18 +8,20 @@
 
 AIMac is not another installer.
 
-It is a **state convergence system** that:
+It is a **state convergence system** for macOS that:
 
-- detects your current Mac environment
+- detects your current environment
 - plans safe, incremental changes
 - installs only what is missing
-- verifies everything works
-- guides you to your first real AI success
+- verifies that tools are actually usable
+- leaves artifacts for inspection
+- guides users toward a real first AI-ready state
 
 Built for:
 
 - beginners starting AI for the first time
 - existing Mac users who want to become AI-ready without breaking their setup
+- builders who want a profile-driven, repeatable setup flow
 
 ---
 
@@ -29,17 +31,22 @@ Most setup tools stop at installation.
 
 AIMac continues until:
 
-> your first successful AI execution
+> your first successful AI-ready setup state
+
+Not just install.  
+**First success.**
 
 ---
 
 ## What makes it different?
 
 - Works on **both fresh and existing Macs**
-- **Never blindly overwrites** your setup
-- Shows **what will change before it changes**
-- Can be **re-run safely anytime**
-- Goes beyond setup → **first real AI usage**
+- **Detects before changing**
+- Applies **safe, incremental setup**
+- Avoids blindly overwriting existing environments
+- Can be **re-run safely**
+- Uses **profiles** as the source of truth
+- Goes beyond setup → **verification and readiness**
 
 ---
 
@@ -49,6 +56,7 @@ AIMac continues until:
 - Detect before change.
 - Safe by default.
 - Idempotent and inspectable.
+- AI-first, but beginner-safe.
 - Finish at first success, not first install.
 
 ---
@@ -57,26 +65,77 @@ AIMac continues until:
 
 AIMac builds on top of proven tools:
 
-- Homebrew (package management)
-- mise (runtime management)
-- chezmoi (dotfiles)
+- Homebrew
+- mise
+- chezmoi (planned)
 
-This project **does not replace them** — it orchestrates them.
+It does **not** replace them — it orchestrates them.
 
 ---
 
-## Commands (v0)
+## Current Profiles
+
+- `beginner`
+  - safe first-step profile for AI learners
+- `builder`
+  - adds GitHub CLI for repo-centric AI workflows
+
+More profiles are planned.
+
+---
+
+## Quick Start
 
 ```bash
-aimac doctor
-aimac plan --profile beginner
-aimac apply --profile beginner --safe
-aimac verify
-aimac report
+git clone https://github.com/masaakisakamoto/aimac.git
+cd aimac
+
+./cli/aimac doctor
+./cli/aimac plan --profile=beginner --safe
+./cli/aimac apply --profile=beginner --safe
+./cli/aimac verify --profile=beginner
 ```
 
 ---
 
-## Status
+## Commands
 
-🚧 v0.1 in progress
+```bash
+./cli/aimac doctor
+./cli/aimac plan --profile=beginner --safe
+./cli/aimac apply --profile=beginner --safe
+./cli/aimac verify --profile=beginner
+./cli/aimac report
+```
+
+Builder example:
+
+```bash
+./cli/aimac plan --profile=builder --safe
+./cli/aimac apply --profile=builder --safe
+./cli/aimac verify --profile=builder
+```
+
+---
+
+## Current Capabilities
+
+- environment diagnosis
+- conflict detection for runtime managers
+- profile-driven planning
+- profile-driven apply
+- profile-driven verify
+- markdown artifact reporting
+
+---
+
+## Project Status
+
+🚧 v0.1 in active development
+
+Current focus:
+
+- profile-driven architecture
+- stronger artifact outputs
+- safer apply/force boundaries
+- richer readiness checks
