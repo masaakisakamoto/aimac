@@ -16,12 +16,29 @@ for arg in "$@"; do
   esac
 done
 
+PROFILE_FILE="profiles/${PROFILE}.yaml"
+
 echo "AIMac Apply"
 echo "==========="
 echo
 echo "Profile: $PROFILE"
 echo "Safe mode: $SAFE_MODE"
 echo
+
+if [[ ! -f "$PROFILE_FILE" ]]; then
+  echo "Profile file not found: $PROFILE_FILE"
+  exit 1
+fi
+
+profile_has_formula() {
+  local formula="$1"
+  grep -A20 '^formulas:' "$PROFILE_FILE" | grep -q "^- $formula\|^  - $formula"
+}
+
+profile_has_cask() {
+  local cask="$1"
+  grep -A20 '^casks:' "$PROFILE_FILE" | grep -q "^- $cask\|^  - $cask"
+}
 
 install_brew_formula() {
   local formula="$1"
@@ -96,61 +113,35 @@ else
 fi
 
 # --------------------------------------------------
-# Runtime / AI tooling
+# Profile-driven formulas
 # --------------------------------------------------
-if command -v mise >/dev/null 2>&1; then
-  echo "✔ mise already installed"
-else
-  install_brew_formula mise
+if profile_has_formula "mise"; then
+  if command -v mise >/dev/null 2>&1; then
+    echo "✔ mise already installed"
+  else
+    install_brew_formula mise
+  fi
 fi
 
-if command -v uv >/dev/null 2>&1; then
-  echo "✔ uv already installed"
-else
-  install_brew_formula uv
+if profile_has_formula "uv"; then
+  if command -v uv >/dev/null 2>&1; then
+    echo "✔ uv already installed"
+  else
+    install_brew_formula uv
+  fi
 fi
 
 # --------------------------------------------------
-# Profile-specific additions
+# Profile-driven casks
 # --------------------------------------------------
-case "$PROFILE" in
-  beginner)
-    if command -v code >/dev/null 2>&1; then
-      echo "✔ Visual Studio Code CLI already available"
-    else
-      install_brew_cask visual-studio-code
-      echo "Note: you may still need to enable the 'code' command from VS Code."
-    fi
-    ;;
-  builder)
-    if command -v code >/dev/null 2>&1; then
-      echo "✔ Visual Studio Code CLI already available"
-    else
-      install_brew_cask visual-studio-code
-      echo "Note: you may still need to enable the 'code' command from VS Code."
-    fi
-
-    if command -v gh >/dev/null 2>&1; then
-      echo "✔ GitHub CLI already installed"
-    else
-      install_brew_formula gh
-    fi
-    ;;
-  local-ai)
-    if command -v ollama >/dev/null 2>&1; then
-      echo "✔ Ollama already installed"
-    else
-      install_brew_formula ollama
-    fi
-    ;;
-  minimal)
-    echo "Minimal profile selected: applying only essential missing components"
-    ;;
-  *)
-    echo "Unknown profile: $PROFILE"
-    exit 1
-    ;;
-esac
+if profile_has_cask "visual-studio-code"; then
+  if command -v code >/dev/null 2>&1; then
+    echo "✔ Visual Studio Code CLI already available"
+  else
+    install_brew_cask visual-studio-code
+    echo "Note: you may still need to enable the 'code' command from VS Code."
+  fi
+fi
 
 # --------------------------------------------------
 # Git identity reminder

@@ -16,12 +16,19 @@ for arg in "$@"; do
   esac
 done
 
+PROFILE_FILE="profiles/${PROFILE}.yaml"
+
 echo "AIMac Plan"
 echo "=========="
 echo
 echo "Profile: $PROFILE"
 echo "Safe mode: $SAFE_MODE"
 echo
+
+if [[ ! -f "$PROFILE_FILE" ]]; then
+  echo "Profile file not found: $PROFILE_FILE"
+  exit 1
+fi
 
 install_items=()
 upgrade_items=()
@@ -47,6 +54,16 @@ add_conflict() {
 
 add_manual() {
   manual_items+=("$1")
+}
+
+profile_has_formula() {
+  local formula="$1"
+  grep -A20 '^formulas:' "$PROFILE_FILE" | grep -q "^- $formula\|^  - $formula"
+}
+
+profile_has_cask() {
+  local cask="$1"
+  grep -A20 '^casks:' "$PROFILE_FILE" | grep -q "^- $cask\|^  - $cask"
 }
 
 # --------------------------------------------------
@@ -92,58 +109,34 @@ else
 fi
 
 # --------------------------------------------------
-# Runtime / AI tooling
+# Profile-driven formulas
 # --------------------------------------------------
-if ! command -v mise >/dev/null 2>&1; then
-  add_install "mise"
-else
-  add_skip "mise already installed"
+if profile_has_formula "mise"; then
+  if ! command -v mise >/dev/null 2>&1; then
+    add_install "mise"
+  else
+    add_skip "mise already installed"
+  fi
 fi
 
-if ! command -v uv >/dev/null 2>&1; then
-  add_install "uv"
-else
-  add_skip "uv already installed"
+if profile_has_formula "uv"; then
+  if ! command -v uv >/dev/null 2>&1; then
+    add_install "uv"
+  else
+    add_skip "uv already installed"
+  fi
 fi
 
 # --------------------------------------------------
-# Profile-specific additions
+# Profile-driven casks
 # --------------------------------------------------
-case "$PROFILE" in
-  beginner)
-    if ! command -v code >/dev/null 2>&1; then
-      add_install "Visual Studio Code"
-    else
-      add_skip "Visual Studio Code CLI already available"
-    fi
-    ;;
-  builder)
-    if ! command -v code >/dev/null 2>&1; then
-      add_install "Visual Studio Code"
-    else
-      add_skip "Visual Studio Code CLI already available"
-    fi
-
-    if ! command -v gh >/dev/null 2>&1; then
-      add_install "GitHub CLI"
-    else
-      add_skip "GitHub CLI already installed"
-    fi
-    ;;
-  local-ai)
-    if ! command -v ollama >/dev/null 2>&1; then
-      add_install "Ollama"
-    else
-      add_skip "Ollama already installed"
-    fi
-    ;;
-  minimal)
-    add_skip "Minimal profile selected: only missing essentials will be considered"
-    ;;
-  *)
-    add_manual "Unknown profile: $PROFILE"
-    ;;
-esac
+if profile_has_cask "visual-studio-code"; then
+  if command -v code >/dev/null 2>&1; then
+    add_skip "Visual Studio Code CLI already available"
+  else
+    add_install "Visual Studio Code"
+  fi
+fi
 
 # --------------------------------------------------
 # Conflict detection

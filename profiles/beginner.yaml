@@ -1,0 +1,29 @@
+name: beginner
+description: Safe first-step profile for users starting AI on macOS
+
+formulas:
+  - mise
+  - uv
+
+casks:
+  - visual-studio-code
+
+optional_formulas:
+  - gh
+
+optional_casks: []
+
+verify_commands:
+  - git
+  - python3
+  - node
+  - brew
+  - mise
+  - uv
+  - code
+
+notes:
+  - Prefer additive setup
+  - Do not overwrite existing runtime managers automatically
+  - Finish at first success, not first install
+  
