@@ -1,0 +1,31 @@
+name: builder
+description: AI builder profile for users creating apps, tools, and workflows on macOS
+
+formulas:
+  - mise
+  - uv
+  - gh
+
+casks:
+  - visual-studio-code
+
+optional_formulas:
+  - ollama
+
+optional_casks: []
+
+verify_commands:
+  - git
+  - python3
+  - node
+  - brew
+  - mise
+  - uv
+  - code
+  - gh
+
+notes:
+  - Prefer additive setup
+  - Keep existing environments intact unless explicitly changed
+  - Builder profile adds GitHub CLI for repo-centric workflows
+  

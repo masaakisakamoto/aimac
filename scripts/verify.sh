@@ -123,6 +123,14 @@ if profile_has_verify_command "code"; then
   fi
 fi
 
+if profile_has_verify_command "gh"; then
+  if command -v gh >/dev/null 2>&1; then
+    pass "GitHub CLI is available"
+  else
+    fail "GitHub CLI is missing"
+  fi
+fi
+
 # --------------------------------------------------
 # Optional checks
 # --------------------------------------------------

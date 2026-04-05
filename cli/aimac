@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 
-COMMAND=$1
+COMMAND="${1:-}"
 
 case "$COMMAND" in
   doctor)
-    bash scripts/detect.sh
+    shift
+    bash scripts/detect.sh "$@"
     ;;
   plan)
+    shift
     bash scripts/plan.sh "$@"
     ;;
   apply)
+    shift
     bash scripts/apply.sh "$@"
     ;;
   verify)
-    bash scripts/verify.sh
+    shift
+    bash scripts/verify.sh "$@"
     ;;
   report)
-    bash scripts/report.sh
+    shift
+    bash scripts/report.sh "$@"
     ;;
   *)
     echo "Usage: aimac {doctor|plan|apply|verify|report}"
+    exit 1
     ;;
 esac

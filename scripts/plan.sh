@@ -127,6 +127,14 @@ if profile_has_formula "uv"; then
   fi
 fi
 
+if profile_has_formula "gh"; then
+  if ! command -v gh >/dev/null 2>&1; then
+    add_install "GitHub CLI"
+  else
+    add_skip "GitHub CLI already installed"
+  fi
+fi
+
 # --------------------------------------------------
 # Profile-driven casks
 # --------------------------------------------------
